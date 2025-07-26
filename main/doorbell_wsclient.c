@@ -1,5 +1,7 @@
 #include "doorbell_wsclient.h"
 #include "doorbell_config.h"
+#include "esp_log.h"
+#include "esp_websocket_client.h"
 
 #define TAG "doorbell_wsclient"
 

@@ -1,6 +1,22 @@
 #ifndef __DOORBELL_CONDIG_H__
 #define __DOORBELL_CONDIG_H__
 
+// 摄像头引脚
+#define CAM_VSYNC_PIN 41
+#define CAM_HREF_PIN 39
+#define CAM_PCLK_PIN 34
+#define CAM_MCLK_PIN 37
+#define CAM_D0_PIN 9
+#define CAM_D1_PIN 11
+#define CAM_D2_PIN 12
+#define CAM_D3_PIN 10
+#define CAM_D4_PIN 33
+#define CAM_D5_PIN 35
+#define CAM_D6_PIN 36
+#define CAM_D7_PIN 38
+#define CAM_PWDN_PIN -1
+#define CAM_RESET_PIN -1
+
 // I2S采样率
 #define I2S_SAMPLE_RATE 16000
 

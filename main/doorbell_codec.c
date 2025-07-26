@@ -20,19 +20,19 @@ static i2s_chan_handle_t rx_handle = NULL;
 static i2s_chan_handle_t tx_handle = NULL; 
 
 // I2C初始化
-static void doorbell_codec_i2c_init(void)
-{
-    i2c_config_t i2c_cfg = {
-        .mode = I2C_MODE_MASTER,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = 100000,
-    };
-    i2c_cfg.sda_io_num = I2C_SDA_PIN;
-    i2c_cfg.scl_io_num = I2C_SCL_PIN;
-    ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &i2c_cfg));
-    i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
-}
+// static void doorbell_codec_i2c_init(void)
+// {
+//     i2c_config_t i2c_cfg = {
+//         .mode = I2C_MODE_MASTER,
+//         .sda_pullup_en = GPIO_PULLUP_ENABLE,
+//         .scl_pullup_en = GPIO_PULLUP_ENABLE,
+//         .master.clk_speed = 100000,
+//     };
+//     i2c_cfg.sda_io_num = I2C_SDA_PIN;
+//     i2c_cfg.scl_io_num = I2C_SCL_PIN;
+//     ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &i2c_cfg));
+//     i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
+// }
 
 // I2S初始化
 static void doorbell_codec_i2s_init(i2s_chan_handle_t *tx_handle_p, i2s_chan_handle_t *rx_handle_p)
@@ -72,7 +72,7 @@ void doorbell_codec_init(void)
 {
     /* ---------------- i2c控制通道初始化 ---------------- */
     // i2c初始化
-    doorbell_codec_i2c_init();
+    // doorbell_codec_i2c_init();
     // gpio_if和ctrl_if初始化
     audio_codec_i2c_cfg_t i2c_config = {
         .addr = ES8311_CODEC_DEFAULT_ADDR,

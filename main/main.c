@@ -4,6 +4,7 @@
 #include "doorbell_led.h"
 #include "doorbell_button.h"
 #include "doorbell_codec.h"
+#include "doorbell_camera.h"
 
 #define TAG "Main"
 /**
@@ -46,6 +47,9 @@ void app_main(void)
     // // 参数: BUTTON_SINGLE_CLICK表示单击事件，back_buton_cb是回调函数，NULL是传递给回调函数的参数
     // doorbell_button_register_back_callback(BUTTON_SINGLE_CLICK, back_buton_cb, NULL);
 
+    // 初始化摄像头
+    doorbell_camera_init();
+
     /* ------------- 测试：音频编解码器 ------------- */
     // 初始化音频编解码器，配置相关硬件和接口
     doorbell_codec_init();
@@ -57,6 +61,18 @@ void app_main(void)
     doorbell_codec_open();
     // 分配2048字节的内存缓冲区用于音频数据读写
     void *buf = malloc(2048);
+    
+    /* ------------- 测试： 音频数据采集与播放 ------------- */
+    
+    for (size_t i = 0; i < 10; i++)
+    {
+        camera_fb_t *pic = doorbell_camera_capture();
+        ESP_LOGI(TAG, "Picture captured, width = %u, height = %u, len = %u", pic->width, pic->height, pic->len);
+        doorbell_camera_release(pic);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    doorbell_camera_deinit();
+
     // 进入无限循环，持续进行音频数据的读取和回放
     // 实现音频回环功能：从麦克风读取音频数据并立即通过扬声器播放
     while (1)
