@@ -25,7 +25,7 @@ void doorbell_codec_set_volume(int volume);
  * @brief 设置麦克风增益
  * @param again 麦克风模拟增益值，控制录音输入灵敏度
  */
-void doorbell_codec_set_mic_gain(int again);
+void doorbell_codec_set_mic_gain(int gain);
 
 /**
  * @brief 从编解码器读取音频数据

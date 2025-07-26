@@ -5,6 +5,11 @@
 #include "driver/i2c.h"
 #include "doorbell_config.h"
 
+static const audio_codec_ctrl_if_t *ctrl_if = NULL;
+static const audio_codec_gpio_if_t *gpio_if = NULL;
+static const audio_codec_if_t *codec_if = NULL;
+static const audio_codec_data_if_t *data_if = NULL;
+
 
 // 音频设备句柄
 static esp_codec_dev_handle_t codec_dev = NULL;
@@ -12,16 +17,16 @@ static esp_codec_dev_handle_t codec_dev = NULL;
 // 静态变量用于存储I2S接收通道的句柄，初始化为NULL
 static i2s_chan_handle_t rx_handle = NULL;
 // 静态变量用于存储I2S发送通道的句柄，初始化为NULL
-static i2s_chan_handle_t tx_handle = NULL;
+static i2s_chan_handle_t tx_handle = NULL; 
 
 // I2C初始化
 static void doorbell_codec_i2c_init(void)
 {
     i2c_config_t i2c_cfg = {
         .mode = I2C_MODE_MASTER,
-        .sda_pullup_en = GPIO_PULLDOWN_ENABLE,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
         .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = 1000000,
+        .master.clk_speed = 100000,
     };
     i2c_cfg.sda_io_num = I2C_SDA_PIN;
     i2c_cfg.scl_io_num = I2C_SCL_PIN;
@@ -34,7 +39,7 @@ static void doorbell_codec_i2s_init(i2s_chan_handle_t *tx_handle_p, i2s_chan_han
 {
     // 创建通道句柄
     i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
-    chan_cfg.auto_clear_before_cb = true;
+    chan_cfg.auto_clear_after_cb = true;
     // 创建通道
     ESP_ERROR_CHECK(i2s_new_channel(&chan_cfg, tx_handle_p, rx_handle_p));
 
@@ -69,13 +74,13 @@ void doorbell_codec_init(void)
     // i2c初始化
     doorbell_codec_i2c_init();
     // gpio_if和ctrl_if初始化
-    audio_codec_i2c_cfg_t i2c_cfg = {
+    audio_codec_i2c_cfg_t i2c_config = {
         .addr = ES8311_CODEC_DEFAULT_ADDR,
         .port = I2C_NUM_0,
     };
-    const audio_codec_ctrl_if_t *ctrl_if = audio_codec_new_i2c_ctrl(&i2c_cfg);
-    const audio_codec_gpio_if_t *gpio_if = audio_codec_new_gpio();
-
+    ctrl_if = audio_codec_new_i2c_ctrl(&i2c_config);
+    gpio_if = audio_codec_new_gpio();
+    // 控制通道初始化
     es8311_codec_cfg_t es8311_config = {
         .ctrl_if = ctrl_if,
         .gpio_if = gpio_if,
@@ -85,18 +90,19 @@ void doorbell_codec_init(void)
         .no_dac_ref = true,
         .mclk_div = 256,
     };
-    const audio_codec_if_t *codec_if = es8311_codec_new(&es8311_config);
+    codec_if = es8311_codec_new(&es8311_config);
     assert(codec_if);
 
     /* ---------------- i2s数据通道初始化 ---------------- */
     doorbell_codec_i2s_init(&tx_handle, &rx_handle);
 
     // 创建数字通道
-    audio_codec_i2s_cfg_t i2c_config = {
+    audio_codec_i2s_cfg_t i2s_config = {
         .rx_handle = rx_handle,
         .tx_handle = tx_handle,
     };
-    const audio_codec_data_if_t *data_if = audio_codec_new_i2s_data(&i2c_config);
+    data_if = audio_codec_new_i2s_data(&i2s_config);
+    assert(data_if);
 
     // 创建音频设备
     esp_codec_dev_cfg_t codec_config = {
@@ -139,9 +145,9 @@ void doorbell_codec_set_volume(int volume)
  * @brief 设置麦克风增益
  * @param again 麦克风模拟增益值，控制录音输入灵敏度
  */
-void doorbell_codec_set_mic_gain(int again)
+void doorbell_codec_set_mic_gain(int gain)
 {
-    assert(esp_codec_dev_set_in_gain(codec_dev, again) == ESP_CODEC_DEV_OK);
+    assert(esp_codec_dev_set_in_gain(codec_dev, gain) == ESP_CODEC_DEV_OK);
 }
 
 /**
@@ -182,6 +188,11 @@ void doorbell_codec_deinit(void)
 {
     // 删除编解码器设备实例，释放相关资源
     esp_codec_dev_delete(codec_dev);
+
+    audio_codec_delete_codec_if(codec_if);
+    audio_codec_delete_ctrl_if(ctrl_if);
+    audio_codec_delete_gpio_if(gpio_if);
+    audio_codec_delete_data_if(data_if);
     
     // 禁用I2S接收和发送通道
     i2s_channel_disable(rx_handle);
