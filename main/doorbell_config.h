@@ -2,7 +2,7 @@
 #define __DOORBELL_CONDIG_H__
 
 // I2S采样率
-#define I2S_SAMPLE_RATE 1600
+#define I2S_SAMPLE_RATE 16000
 
 // I2S采样位数
 #define I2S_BITS_PER_SAMPLE 16
@@ -24,5 +24,7 @@
 
 // LED引脚
 #define LED_PIN 46
+
+#define SERVER_IP "169.254.138.213"
 
 #endif /* __DOORBELL_CONDIG_H__ */

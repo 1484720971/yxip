@@ -50,9 +50,9 @@ void app_main(void)
     // 初始化音频编解码器，配置相关硬件和接口
     doorbell_codec_init();
     // 设置音频输出音量为60（音量等级根据编解码器规格而定）
-    doorbell_codec_set_volume(30);
+    doorbell_codec_set_volume(60);
     // 设置麦克风输入增益为10（控制录音灵敏度）
-    doorbell_codec_set_mic_gain(5);
+    doorbell_codec_set_mic_gain(10);
     // 打开音频编解码器，使其进入可操作状态
     doorbell_codec_open();
     // 分配2048字节的内存缓冲区用于音频数据读写
