@@ -5,9 +5,13 @@
 #include "driver/i2c.h"
 #include "doorbell_config.h"
 
+/* 音频编解码器控制接口指针 */
 static const audio_codec_ctrl_if_t *ctrl_if = NULL;
+/* 音频编解码器GPIO接口指针 */
 static const audio_codec_gpio_if_t *gpio_if = NULL;
+/* 音频编解码器主接口指针 */
 static const audio_codec_if_t *codec_if = NULL;
+/* 音频编解码器数据接口指针 */
 static const audio_codec_data_if_t *data_if = NULL;
 
 

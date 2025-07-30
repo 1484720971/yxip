@@ -7,18 +7,35 @@
 #include "doorbell_camera.h"
 #include "doorbell_wifi.h"
 #include "esp_system.h"
+#include "doorbell_mqtt.h"
 
 #define TAG "Main"
 
-static void front_button_cb(void *button_handle, void *usr_data)
+static bool led_on = false;
+static void led_switch(void *arg)
 {
-    doorbell_wifi_reset_provisioning();
-    esp_restart();
+    if (led_on)
+    {
+        doorbell_led_off();
+        led_on = false;
+    }
+    else
+    {
+        doorbell_led_on();
+        led_on = true;
+    }
 }
 
 void app_main(void)
 {
-    doorbell_button_init();
-    doorbell_button_register_front_callback(BUTTON_SINGLE_CLICK, front_button_cb, NULL);
+    doorbell_led_init();
     doorbell_wifi_init();
+    doorbell_mqtt_init();
+
+    mqtt_cmd_t cmd = {
+        .arg = NULL,
+        .cmd = "led_switch",
+        .callback = led_switch
+    };
+    doorbell_mqtt_register_cmd(&cmd);
 }

@@ -5,5 +5,6 @@ idf_component_register(SRCS
                     "doorbell_camera.c"
                     "doorbell_wsclient.c"
                     "doorbell_wifi.c"
+                    "doorbell_mqtt.c"
                     "main.c"
                     INCLUDE_DIRS ".")
